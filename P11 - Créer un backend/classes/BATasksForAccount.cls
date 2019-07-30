@@ -19,7 +19,7 @@ global with sharing class BATasksForAccount implements Database.Batchable<sObjec
     
     global BATasksForAccount (){
 			//Récupération de tous les comptes n'ayant pas d'oder avec les tâches "Rappel"
-            query = 'Select id,(select Id from tasks where type =\'Appel\') from account where id not in (select AccountId from Order)';     
+            query = 'Select id,OwnerId,(select Id from tasks where type =\'Appel\') from account where id not in (select AccountId from Order)';     
     }
     
     global Database.QueryLocator start(Database.BatchableContext BC){
@@ -32,7 +32,7 @@ global with sharing class BATasksForAccount implements Database.Batchable<sObjec
         for(Account a : scope){  
 			//Si le compte ne possède pas de tâche "Rappel", il faut lui en créer une
             if ( a.tasks.size() == 0){
-                l.add(new Task(type='Appel',whatId=a.Id,Status='Nouvelle',Priority='Normale',ReminderDateTime = System.today()+5));
+                l.add(new Task(type='Appel',whatId=a.Id,Status='Nouvelle',Priority='Normale',ReminderDateTime = System.today()+5),OwnerId=a.OwnerId);
             }       
         }
         
